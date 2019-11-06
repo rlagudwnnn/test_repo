@@ -17,9 +17,9 @@ y_train = np_utils.to_categorical(y_train)
 y_test = np_utils.to_categorical(y_test)
 
 
-x_val = x_train[:42000] # 훈련셋의 30%를 검증셋으로 사용
+x_val = x_train[:42000] 
 x_train = x_train[42000:]
-y_val = y_train[:42000] # 훈련셋의 30%를 검증셋으로 사용
+y_val = y_train[:42000] 
 y_train = y_train[42000:]
 
 
