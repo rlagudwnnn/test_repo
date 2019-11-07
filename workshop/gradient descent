@@ -1,4 +1,6 @@
 ##creating and vizualizing a random function
+##gradient descent for a simple 2 dimension regression problem
+
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -12,3 +14,88 @@ plt.ylabel("y", fontsize = 18, rotation = 0)
 plt.show()
 
 
+from mpl_toolkits.mplot3d import Axes3D
+from matplotlib import cm
+from matplotlib.ticker import LinearLocator, FormatStrFormatter
+
+
+fig = plt.figure()
+ax = fig.gca(projection='3d')
+theta_1 = np.arange(0,7, 0.10)
+theta_2 = np.arange(0, 5, 0.10)
+theta_1, theta_2 = np.meshgrid(theta_1, theta_2)
+concat_theta = np.c_[theta_1,theta_2]
+
+# Fix X=2 => y=10
+# we want this value to be as small as possible
+error_theta=  np.absolute(10- (theta_1**2 + theta_2))
+
+# Plot the surface.
+surf = ax.plot_surface(theta_1, theta_2, error_theta, cmap=cm.coolwarm,
+                       linewidth=0, antialiased=False)
+
+# Customize the z axis.
+ax.set_zlim(0, 40)
+ax.zaxis.set_major_locator(LinearLocator(10))
+ax.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
+
+# Add a color bar which maps values to colors.
+fig.colorbar(surf, shrink=0.5, aspect=5)
+
+#Title
+plt.suptitle('For X=2 then y=10', fontsize = 16)
+plt.show()
+
+
+##If positif, we have ascending values
+##If negatif, we have descending values
+##If equal to 0, we are in a local minimum or maximum
+
+def cal_cost(theta, X, y):
+  m = len(X)
+  predictions = X.dot(theta)
+  cost = (1/2*m)*np.sum(np.square(predictions - y))
+return cost
+  
+
+def gradient_descent(X, y, theta, learning_rate = 0.01, iterations = 100):
+  m = len(y)
+  cost_history = np.zeros(iterations)
+  theta_history = np.zeros((iterations, 2))
+
+  for i in range(iterations):
+    prediction = np.dot(X, theta)
+    theta = theta - (1/m)*learning_rate*(X.T.dot((prediction - y)))
+    theta_history[1, :] = theta.T
+    cost_history[i] = cal_cost(theta, X, y)
+  return theta, cost_history, theta_history
+  
+  
+##Train our model to get the correct weights
+
+ theta = np.random.randn(2, 1)
+ X_b = np.c_[np.ones((len(X), 1)), X]
+ 
+ lr = 0.01
+n_iter = 1000
+
+theta, cost_history, theta_history = gradient_descent(X_b, y, theta, lr, n_iter)
+theta
+
+##Visualize how our model trained and the result
+
+plt.plot(cost_history, range(n_iter), 'g.' )
+plt.xlabel("iterations", fontsize = 15)
+plt.ylabel("cost", rotation = 0, fontsize = 15)
+plt.show()
+
+##If I set the learning rate at 0.01, then the plot looks like polynomial graph which is going down sharply and then stable
+##If I set the learning rate at 0.00001, then the plot looks a line graph which is a negative gradient.
+
+
+plt.plot(X,y,'g.')
+linear_function = theta[0]*X + theta[1]
+plt.plot(X, linear_function)
+plt.xlabel("x", fontsize = 18)
+plt.ylabel("y", fontsize = 18, rotation = 0)
+plt.show()
